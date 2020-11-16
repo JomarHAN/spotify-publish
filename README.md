@@ -1,70 +1,61 @@
-# Getting Started with Create React App
+# Set up spotify
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## ---> npm i spotify-web-api-js
 
-## Available Scripts
+## create a spotify file js to access spotify url and get token
+    - export const authEndpoint = "https://accounts.spotify.com/en/authorize" 
+        --> get the url from spotify developer authentication
 
-In the project directory, you can run:
+    - const redirectUrl = window.location.origin + '/'
+        --> redirect from the default localhost (exp: http://localhost:3000)
 
-### `npm start`
+    - const clientId = 'get from spotify developer dashboard'
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+    - const scope = [
+        'user-read-recently-played',
+        'user-read-plauback-state',
+        'user-modify-playback-state',
+        'user-read-currently-playing',
+        'user-top-read'
+    ]
+        --> to get detail about these scope, read from https://developer.spotify.com/documentation/general/guides/scopes/
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+    - export const loginUrl = `the format based on URL get Web Playback SDK Access Token`
 
-### `npm test`
+    - export const getAccessTokenFormUrl = () => {
+        return window.location.hash
+            .substring(1)
+            .split('&')
+            .reduce((initial,item)=>{
+                let parts = item.split('=');
+                initial[parts[0]] = decodeURIComponent(part[1]);
+                return initial
+            }, {})
+    }
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Login to Spotify to get token later on. In login.js
+    - import {loginUrl} from "./spotify"
+    - button "Login" has href={loginUrl}
 
-### `npm run build`
+## Get token to access, get information : token, user, playlist. Keep track token just into a variable in ContextAPI file, called is token. In app.js
+    - import SpotifyWebApi from 'spotify-web-api-js'
+    - import {getAccessTokenFromUrl} from './spotify.js'
+    - const spotify = new SpotifyWebApi()
+    - useEffect(()=>{
+        const hash = getAccessTokenFromUrl()
+        window.location.hash = " ";
+        const _token = hash["access_token"]
+        if(_token){
+            --> keep track token in datalayer
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+            - spotify.setAccessToken(_token);
+                --> access into spotify
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+            - spotify.getMe().then((user)=>{keep track user into datalayer})
+                --> get user info
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+            spotify.getUserPlaylist().then((playlists)=>{keep track playlists into datalayer})
+                --> get user playlist
+        }
+    })
 
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
