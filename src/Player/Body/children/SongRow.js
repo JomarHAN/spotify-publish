@@ -1,17 +1,56 @@
-import React from 'react'
-import './SongRow.css'
+import React from "react";
+import { useDataLayerValue } from "../../../data/dataLayer";
+import { useSoundLayerValue } from "../../../data/soundLayer";
+import "./SongRow.css";
 
-function SongRow() {
-    return (
-        <div className="songRow">
-            <img src="https://cdn.shortpixel.ai/client/to_webp,q_lossy,ret_img,w_250/https://www.hypebot.com/wp-content/uploads/2020/07/discover-weekly-250x250.png" alt="" className="songRow__album"/>
-            <div className="songRow__info">
-                <h1>Co Chang trai Viet Len Cay</h1>
-                <p>Phan Manh Quynh</p>
-                <p>Mat Biec Album</p>
-            </div>
-        </div>
-    )
+function SongRow({ id, track }) {
+  const [{}, dispatch] = useDataLayerValue();
+  const [{ playing }, soundDispatch] = useSoundLayerValue();
+
+  const changeTrack = () => {
+    dispatch({
+      type: "SET_TRACK",
+      track: track,
+    });
+
+    console.log(track);
+
+    let isPlaying = playing;
+    const audio = new Audio(track?.preview_url);
+
+    soundDispatch({
+      type: "SET_PLAYING",
+      playing: false,
+    });
+
+    soundDispatch({
+      type: "SET_AUDIO",
+      audio: audio,
+    });
+
+    if (!isPlaying) {
+      soundDispatch({
+        type: "SET_PLAYING",
+        playing: true,
+      });
+    }
+
+    document.title = `${track?.name} - ${track?.artists[0]?.name}`;
+  };
+  return (
+    <div className="songRow" onClick={() => changeTrack()}>
+      <img
+        src={track?.album?.images[0]?.url}
+        alt=""
+        className="songRow__album"
+      />
+      <div className="songRow__info">
+        <h1>{track?.name}</h1>
+        <p>{track?.artists[0]?.name}</p>
+        <p>{track?.album?.name}</p>
+      </div>
+    </div>
+  );
 }
 
-export default SongRow
+export default SongRow;
