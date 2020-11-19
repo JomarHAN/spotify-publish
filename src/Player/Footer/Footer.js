@@ -14,9 +14,9 @@ import { useDataLayerValue } from "../../data/dataLayer";
 import { useSoundLayerValue } from "../../data/soundLayer";
 import "./Footer.css";
 function Footer() {
-  const [{ track, tracks }] = useDataLayerValue();
+  const [{ track, tracks }, dispatch] = useDataLayerValue();
   const [
-    { playing, volume, repeat, shuffle, audio, randomSong },
+    { playing, volume, repeat, shuffle, audio, isRandom },
     soundDispatch,
   ] = useSoundLayerValue();
   const [random, setRandom] = useState(null);
@@ -66,51 +66,113 @@ function Footer() {
     });
   };
 
+  const setNewTrack = (rawTrack) => {
+    soundDispatch({
+      type: "SET_TRACK",
+      track: rawTrack,
+    });
+
+    let isPlaying = playing;
+    soundDispatch({
+      type: "SET_PLAYING",
+      playing: false,
+    });
+
+    let audio = new Audio(rawTrack?.preview_url);
+    audio.loop = repeat;
+
+    soundDispatch({
+      type: "SET_AUDIO",
+      audio: audio,
+    });
+
+    if (isPlaying) {
+      soundDispatch({
+        type: "SET_PLAYING",
+        playing: true,
+      });
+    }
+    document.title = `${rawTrack?.name} - ${rawTrack?.artists[0]?.name}`;
+  };
+
+  const isShuffle = () => {
+    if (shuffle) {
+      while (true) {
+        let randomNumber = Math.floor(Math.random() * tracks.items.length);
+        let randomTrack = tracks.items[randomNumber].track;
+        setRandom(randomTrack);
+        if (track !== randomTrack) {
+          setNewTrack(randomTrack);
+        }
+        soundDispatch({
+          type: "SET_PREVIOUS",
+          previous: randomTrack,
+        });
+        soundDispatch({
+          type: "SET_ISRANDOM",
+          isRandom: true,
+        });
+        break;
+      }
+    }
+  };
+
   if (audio) {
     audio.onended = () => {
-      if (shuffle) {
-        while (true) {
-          let randomNumber = Math.floor(Math.random() * tracks.items.length);
-          let randomTrack = tracks.items[randomNumber].track;
-          setRandom(randomTrack);
-
-          if (track !== randomTrack) {
-            soundDispatch({
-              type: "SET_TRACK",
-              track: randomTrack,
-            });
-
-            let isPlaying = playing;
-            soundDispatch({
-              type: "SET_PLAYING",
-              playing: false,
-            });
-
-            let audio = new Audio(randomTrack.preview_url);
-            audio.loop = repeat;
-
-            soundDispatch({
-              type: "SET_AUDIO",
-              audio: audio,
-            });
-
-            if (isPlaying) {
-              soundDispatch({
-                type: "SET_PLAYING",
-                playing: true,
-              });
-            }
-            document.title = `${randomTrack?.name} - ${randomTrack?.artists[0]?.name}`;
-            break;
-          }
-        }
+      if (shuffle === true) {
+        isShuffle();
+      } else {
+        soundDispatch({
+          type: "SET_PLAYING",
+          playing: false,
+        });
       }
     };
   }
 
   const handlePrevious = () => {
-    console.log("list here >>>", tracks);
-    console.log("current song >>>", track);
+    if (shuffle === true) {
+      isShuffle();
+    } else {
+      const previousTrack = tracks.items[trackIndex() - 1].track;
+      setNewTrack(previousTrack);
+      soundDispatch({
+        type: "SET_ISRANDOM",
+        isRandom: false,
+      });
+      dispatch({
+        type: "SET_TRACK",
+        track: previousTrack,
+      });
+    }
+  };
+
+  const handleNext = () => {
+    if (shuffle === true) {
+      isShuffle();
+    } else {
+      const nextTrack = tracks.items[trackIndex() + 1].track;
+      setNewTrack(nextTrack);
+      soundDispatch({
+        type: "SET_ISRANDOM",
+        isRandom: false,
+      });
+      dispatch({
+        type: "SET_TRACK",
+        track: nextTrack,
+      });
+    }
+  };
+
+  const trackIndex = () => {
+    if (audio) {
+      let itemArray = [];
+      tracks.items.map((item) => {
+        itemArray.push(item.track.preview_url);
+      });
+      const i = itemArray.indexOf(audio.src);
+      return i;
+    }
   };
 
   return (
@@ -131,19 +193,19 @@ function Footer() {
           <>
             <img
               src={
-                random === null
-                  ? track?.album.images[0].url
-                  : random.album.images[0].url
+                isRandom === false
+                  ? track?.album?.images[0]?.url
+                  : random?.album?.images[0]?.url
               }
               alt=""
               className="footer__albumLogo"
             />
             <div className="footer__songInfo">
-              <h4>{random === null ? track?.name : random?.name}</h4>
+              <h4>{isRandom === false ? track?.name : random?.name}</h4>
               <p>
-                {random === null
-                  ? track.artists[0]?.name
-                  : random?.artists[0]?.name}
+                {isRandom === false
+                  ? track?.artists[0].name
+                  : random?.artists[0].name}
               </p>
             </div>
           </>
@@ -154,7 +216,10 @@ function Footer() {
           className={shuffle ? "footer__green" : "footer__icon"}
           onClick={track ? setShuffle : null}
         />
-        <SkipPreviousOutlined onClick={handlePrevious} />
+        <SkipPreviousOutlined
+          className="footer__icon"
+          onClick={handlePrevious}
+        />
         {playing ? (
           <PauseCircleFilled
             className={playing ? "footer__green" : "footer__icon"}
@@ -168,7 +233,7 @@ function Footer() {
             onClick={track ? handlePlay : null}
           />
         )}
-        <SkipNextOutlined />
+        <SkipNextOutlined className="footer__icon" onClick={handleNext} />
         <RepeatOneOutlined
           className={repeat ? "footer__green" : "footer__icon"}
           onClick={track ? setRepeat : null}

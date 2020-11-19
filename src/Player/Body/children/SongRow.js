@@ -5,7 +5,7 @@ import "./SongRow.css";
 
 function SongRow({ id, track }) {
   const [{}, dispatch] = useDataLayerValue();
-  const [{ playing, randomSong }, soundDispatch] = useSoundLayerValue();
+  const [{ playing }, soundDispatch] = useSoundLayerValue();
 
   const changeTrack = () => {
     dispatch({
@@ -19,6 +19,11 @@ function SongRow({ id, track }) {
     soundDispatch({
       type: "SET_PLAYING",
       playing: false,
+    });
+
+    soundDispatch({
+      type: "SET_ISRANDOM",
+      isRandom: false,
     });
 
     soundDispatch({
