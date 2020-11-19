@@ -67,7 +67,7 @@ function Footer() {
   };
 
   const setNewTrack = (rawTrack) => {
-    soundDispatch({
+    dispatch({
       type: "SET_TRACK",
       track: rawTrack,
     });
