@@ -9,19 +9,17 @@ import {
   SkipPreviousOutlined,
   VolumeDownOutlined,
 } from "@material-ui/icons";
-import React from "react";
+import React, { useState } from "react";
 import { useDataLayerValue } from "../../data/dataLayer";
 import { useSoundLayerValue } from "../../data/soundLayer";
 import "./Footer.css";
 function Footer() {
   const [{ track, tracks }] = useDataLayerValue();
   const [
-    { playing, volume, repeat, shuffle, audio },
+    { playing, volume, repeat, shuffle, audio, randomSong },
     soundDispatch,
   ] = useSoundLayerValue();
-
-  console.log(tracks);
-  console.log(audio);
+  const [random, setRandom] = useState(null);
 
   const handlePlay = () => {
     soundDispatch({
@@ -74,6 +72,7 @@ function Footer() {
         while (true) {
           let randomNumber = Math.floor(Math.random() * tracks.items.length);
           let randomTrack = tracks.items[randomNumber].track;
+          setRandom(randomTrack);
 
           if (track !== randomTrack) {
             soundDispatch({
@@ -90,13 +89,18 @@ function Footer() {
             let audio = new Audio(randomTrack.preview_url);
             audio.loop = repeat;
 
-            if (!isPlaying) {
+            soundDispatch({
+              type: "SET_AUDIO",
+              audio: audio,
+            });
+
+            if (isPlaying) {
               soundDispatch({
                 type: "SET_PLAYING",
                 playing: true,
               });
             }
-            document.title = `${randomTrack.name} - ${randomTrack.artist[0].name}`;
+            document.title = `${randomTrack?.name} - ${randomTrack?.artists[0]?.name}`;
             break;
           }
         }
@@ -104,29 +108,53 @@ function Footer() {
     };
   }
 
+  const handlePrevious = () => {
+    console.log("list here >>>", tracks);
+    console.log("current song >>>", track);
+  };
+
   return (
     <div className="footer">
       <div className="footer__left">
-        <img
-          src={
-            track
-              ? track.album.images[0].url
-              : "https://cdn.shortpixel.ai/client/to_webp,q_lossy,ret_img,w_250/https://www.hypebot.com/wp-content/uploads/2020/07/discover-weekly-250x250.png"
-          }
-          alt=""
-          className="footer__albumLogo"
-        />
-        <div className="footer__songInfo">
-          <h4>{track ? track.name : "No Song Choose"}</h4>
-          <p>{track && track.artists[0]?.name}</p>
-        </div>
+        {!track ? (
+          <>
+            <img
+              src="https://cdn.shortpixel.ai/client/to_webp,q_lossy,ret_img,w_250/https://www.hypebot.com/wp-content/uploads/2020/07/discover-weekly-250x250.png"
+              alt=""
+              className="footer__albumLogo"
+            />
+            <div className="footer__songInfo">
+              <h4>No Song Choose</h4>
+            </div>
+          </>
+        ) : (
+          <>
+            <img
+              src={
+                random === null
+                  ? track?.album.images[0].url
+                  : random.album.images[0].url
+              }
+              alt=""
+              className="footer__albumLogo"
+            />
+            <div className="footer__songInfo">
+              <h4>{random === null ? track?.name : random?.name}</h4>
+              <p>
+                {random === null
+                  ? track.artists[0]?.name
+                  : random?.artists[0]?.name}
+              </p>
+            </div>
+          </>
+        )}
       </div>
       <div className="footer__center">
         <ShuffleOutlined
           className={shuffle ? "footer__green" : "footer__icon"}
           onClick={track ? setShuffle : null}
         />
-        <SkipPreviousOutlined />
+        <SkipPreviousOutlined onClick={handlePrevious} />
         {playing ? (
           <PauseCircleFilled
             className={playing ? "footer__green" : "footer__icon"}

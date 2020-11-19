@@ -5,15 +5,13 @@ import "./SongRow.css";
 
 function SongRow({ id, track }) {
   const [{}, dispatch] = useDataLayerValue();
-  const [{ playing }, soundDispatch] = useSoundLayerValue();
+  const [{ playing, randomSong }, soundDispatch] = useSoundLayerValue();
 
   const changeTrack = () => {
     dispatch({
       type: "SET_TRACK",
       track: track,
     });
-
-    console.log(track);
 
     let isPlaying = playing;
     const audio = new Audio(track?.preview_url);

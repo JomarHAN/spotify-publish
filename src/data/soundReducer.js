@@ -3,12 +3,19 @@ export const soundInitialState = {
     playing: false,
     volume: 0.03,
     repeat: false,
-    shuffle: false
+    shuffle: false,
+    randomSong: false
 }
 
 const soundReducer = (state, action) => {
     // console.log(action)
     switch (action.type) {
+
+        case "SET_RANDOMSONG":
+            return {
+                ...state,
+                randomSong: action.randomSong
+            }
 
         case "SET_AUDIO":
             return {
