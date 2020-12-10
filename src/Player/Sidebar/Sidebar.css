@@ -6,6 +6,7 @@
     padding-right: 10px;
     background-color: #040404;
     color: white;
+    transition: 0.2s ease-in-out;
 }
 
 .sidebar__logo{
@@ -24,4 +25,20 @@
     border: 1px solid #282828;
     width: 90%;
     margin: 10px auto;
+}
+
+@media only screen and (max-width: 768px){
+    .sidebar{
+        flex: 0;
+        min-width: 0px;
+        padding: 0;
+        transition: 0.2s ease-in-out;
+    }
+
+    .sidebar__showsup{
+        flex: 0.2;
+        min-width: 230px;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
 }

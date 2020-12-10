@@ -1,7 +1,7 @@
 export const soundInitialState = {
     audio: null,
     playing: false,
-    volume: 0.03,
+    volume: 0.5,
     repeat: false,
     shuffle: false,
     isRandom: false,
@@ -10,7 +10,7 @@ export const soundInitialState = {
 }
 
 const soundReducer = (state, action) => {
-    console.log(action)
+
     switch (action.type) {
 
         case "SET_NEXT":

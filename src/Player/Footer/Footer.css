@@ -44,7 +44,12 @@
 
 .footer__right * .MuiSlider-root{
     color: #1ed15e;
-    width: 90%;
+    width: 80%;
+}
+
+.footer__right .MuiGrid-root{
+    display: flex;
+    align-items: center;
 }
 
 .footer__songInfo > h4 {
@@ -64,4 +69,38 @@
     cursor: pointer;
     transition: transform 0.2s ease-in-out;
     transform: scale(1.2) !important;
+}
+
+@media only screen and (max-width: 768px){
+    .footer{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .footer__right{
+        width: 300px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .footer__right * .MuiSlider-root{
+        width: 100%;
+    }
+    
+    .footer__left{
+        display: none;
+    }
+    
+    .footer__center{
+        padding: 0;
+        width: 300px;
+    }
+}
+
+@media only screen and (max-width: 425px){
+    .footer{
+        padding: 20px 0;
+    }
 }
