@@ -5,7 +5,7 @@ import { useDataLayerValue } from "../../../data/dataLayer";
 import "./Header.css";
 
 function Header() {
-  const [{ user }, dispatch] = useDataLayerValue();
+  const [{ user, popup }, dispatch] = useDataLayerValue();
   const [menu, setMenu] = useState(false);
 
   useEffect(() => {
@@ -24,16 +24,12 @@ function Header() {
 
   return (
     <div className="header">
-      <div className="header__child">
-        <div className="header__menu">
-          {!menu ? (
-            <IconButton
-              className="header__menuBtn"
-              onClick={() => setMenu(true)}
-            >
-              <MenuOpen />
-            </IconButton>
-          ) : (
+      <div className="header__menu">
+        {!menu ? (
+          <IconButton className="header__menuBtn" onClick={() => setMenu(true)}>
+            <MenuOpen />
+          </IconButton>
+        ) : (
             <IconButton
               className="header__menuBtn"
               onClick={() => setMenu(false)}
@@ -41,18 +37,14 @@ function Header() {
               <Close />
             </IconButton>
           )}
-        </div>
-        <div className="header__left">
-          <Search />
-          <input
-            type="text"
-            placeholder="Search for Artists, Songs or Podcast"
-          />
-        </div>
-        <div className="header__right">
-          <Avatar src={user?.images[0]?.url} />
-          <h4>{user?.display_name}</h4>
-        </div>
+      </div>
+      <div className="header__left">
+        <Search />
+        <input type="text" placeholder="Search for Artists, Songs or Podcast" />
+      </div>
+      <div className="header__right">
+        <Avatar src={user?.images[0]?.url} />
+        <h4>{user?.display_name}</h4>
       </div>
     </div>
   );

@@ -4,13 +4,14 @@
     min-width: 230px;
     padding-left: 10px;
     padding-right: 10px;
-    background-color: #040404;
+    background-color: black;
+
     color: white;
     transition: 0.2s ease-in-out;
 }
 
 .sidebar__logo{
-    height: 70px;
+    height: 60px;
     margin-right: auto;
     padding: 10px;
 }

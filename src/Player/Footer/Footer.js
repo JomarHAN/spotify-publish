@@ -16,7 +16,7 @@ import "./Footer.css";
 function Footer() {
   const [{ track, tracks }, dispatch] = useDataLayerValue();
   const [
-    { playing, volume, repeat, shuffle, audio, isRandom },
+    { playing, repeat, shuffle, audio, isRandom },
     soundDispatch,
   ] = useSoundLayerValue();
   const [random, setRandom] = useState(null);
@@ -28,7 +28,7 @@ function Footer() {
     });
     soundDispatch({
       type: "SET_VOLUME",
-      volume: volume / 100,
+      volume: 50 / 100,
     });
   };
 
@@ -190,26 +190,26 @@ function Footer() {
             </div>
           </>
         ) : (
-          <>
-            <img
-              src={
-                isRandom === false
-                  ? track?.album?.images[0]?.url
-                  : random?.album?.images[0]?.url
-              }
-              alt=""
-              className="footer__albumLogo"
-            />
-            <div className="footer__songInfo">
-              <h4>{isRandom === false ? track?.name : random?.name}</h4>
-              <p>
-                {isRandom === false
-                  ? track?.artists[0].name
-                  : random?.artists[0].name}
-              </p>
-            </div>
-          </>
-        )}
+            <>
+              <img
+                src={
+                  isRandom === false
+                    ? track?.album?.images[0]?.url
+                    : random?.album?.images[0]?.url
+                }
+                alt=""
+                className="footer__albumLogo"
+              />
+              <div className="footer__songInfo">
+                <h4>{isRandom === false ? track?.name : random?.name}</h4>
+                <p>
+                  {isRandom === false
+                    ? track?.artists[0].name
+                    : random?.artists[0].name}
+                </p>
+              </div>
+            </>
+          )}
       </div>
       <div className="footer__center">
         <ShuffleOutlined
@@ -227,12 +227,12 @@ function Footer() {
             onClick={track ? handleStop : null}
           />
         ) : (
-          <PlayCircleFilled
-            className={playing ? "footer__green" : "footer__icon"}
-            fontSize="large"
-            onClick={track ? handlePlay : null}
-          />
-        )}
+            <PlayCircleFilled
+              className={playing ? "footer__green" : "footer__icon"}
+              fontSize="large"
+              onClick={track ? handlePlay : null}
+            />
+          )}
         <SkipNextOutlined className="footer__icon" onClick={handleNext} />
         <RepeatOneOutlined
           className={repeat ? "footer__green" : "footer__icon"}
@@ -254,6 +254,7 @@ function Footer() {
               min={0}
               max={100}
               onChange={volumeChange}
+              defaultValue={50}
             />
           </Grid>
         </Grid>
